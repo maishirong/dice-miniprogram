@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "酒桌骰趣",
+    "navigationBarBackgroundColor": "#09110f",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#090b0a",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

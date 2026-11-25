@@ -1,0 +1,271 @@
+page {
+  width: 100%;
+  height: 100%;
+  background: #090b0a;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+
+.stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  color: #fff1d3;
+}
+
+.scene {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+.veil {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  /* 原版游戏舞台用清晰场景图，不加暗化遮罩；这里只保留极淡压暗确保文字可读 */
+  background: linear-gradient(rgba(5, 11, 11, .10), rgba(5, 10, 9, .16));
+}
+.tap-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.header {
+  position: absolute;
+  top: 5vh;
+  left: 6%;
+  right: 6%;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.brand { display: flex; flex-direction: column; }
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  color: #edd199;
+  font-size: 20rpx;
+  letter-spacing: 5rpx;
+  font-weight: 600;
+}
+.diamond {
+  display: inline-block;
+  width: 12rpx;
+  height: 17rpx;
+  background: #eec58a;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+.diamond.small { width: 10rpx; height: 14rpx; }
+.title {
+  margin-top: 8rpx;
+  font-family: "Songti SC", "STSong", "SimSun", serif;
+  font-size: 76rpx;
+  font-weight: 600;
+  letter-spacing: 4rpx;
+  line-height: 1.12;
+  color: #fff0d4;
+  text-shadow: 0 4rpx 24rpx #3516056b;
+}
+.settings-btn {
+  width: 88rpx;
+  height: 88rpx;
+  border: 1rpx solid #c09c6f;
+  border-radius: 50%;
+  background: #140a0bdc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gear { color: #f0c88a; font-size: 46rpx; line-height: 1; }
+
+.playfield {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+
+/* 实景骰盅：盖住态居中偏下，掀开态平移到右上并旋转，掷骰时抖动 */
+.cup-control {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 50%;
+  width: 68%;
+  height: 44%;
+  transform: translate(-50%, -50%);
+}
+.cup-rig {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform .72s cubic-bezier(.18, .77, .19, 1);
+  filter: drop-shadow(0 26rpx 22rpx #0007);
+}
+.cup-art {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  transition: opacity .28s ease;
+}
+.cup-open-art { opacity: 0; }
+.cup-control.cup-open .cup-rig {
+  transform: translate(9vw, -21vh) rotate(-4deg) scale(.92);
+}
+.cup-control.cup-open .cup-closed { opacity: 0; transition-delay: .12s; }
+.cup-control.cup-open .cup-open-art { opacity: 1; transition-delay: .28s; }
+.cup-control.cup-rattling .cup-rig { animation: cup-rattle 1.06s cubic-bezier(.35, .05, .64, .95) infinite; }
+@keyframes cup-rattle {
+  0%, 100% { transform: rotate(-1.5deg) translateY(0); }
+  20% { transform: rotate(5deg) translateY(-10rpx); }
+  43% { transform: rotate(-5deg) translateY(4rpx); }
+  68% { transform: rotate(4deg) translateY(-6rpx); }
+  85% { transform: rotate(-3deg) translateY(2rpx); }
+}
+
+.status {
+  position: absolute;
+  left: 50%;
+  top: 78%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx 30rpx;
+  min-height: 48rpx;
+  border: 1rpx solid #ae8b54;
+  border-radius: 60rpx;
+  background: #05160ff2;
+  color: #f6d79e;
+  font-size: 28rpx;
+  letter-spacing: 2rpx;
+  white-space: nowrap;
+}
+
+.bar {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: max(5vh, 80rpx);
+  z-index: 5;
+}
+.counter-label {
+  display: block;
+  margin: 0 0 12rpx 6rpx;
+  font-size: 26rpx;
+  letter-spacing: 3rpx;
+  color: #f4d9aa;
+}
+.bar-row { display: flex; gap: 4%; align-items: stretch; }
+.counter {
+  flex: 0 0 38%;
+  display: flex;
+  align-items: stretch;
+  background: linear-gradient(155deg, #37242d, #1e141a 70%);
+  border: 1rpx solid #bc9866;
+  border-radius: 24rpx;
+}
+.step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52rpx;
+  font-weight: 300;
+  color: #fae0b9;
+}
+.step.disabled { opacity: .32; }
+.num {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56rpx;
+  color: #fde8c2;
+  font-family: Baskerville, Georgia, serif;
+}
+.roll-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14rpx;
+  height: 108rpx;
+  border-radius: 24rpx;
+  color: #3c211d;
+  background: linear-gradient(145deg, #fbe6bf 0%, #e9c48c 42%, #cf9b62 100%);
+  border: 1rpx solid #ffe1a6;
+  box-shadow: 0 6rpx #7c512d, 0 12rpx 28rpx #0008;
+  font-size: 42rpx;
+  font-weight: 650;
+  letter-spacing: 2rpx;
+}
+.roll-btn.rolling { filter: saturate(.8) brightness(.89); }
+.die-icon { font-size: 40rpx; }
+
+.sheet-mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  background: #040906b8;
+}
+.sheet {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 21;
+  width: 82%;
+  max-height: 84vh;
+  overflow: auto;
+  padding: 40rpx 40rpx 24rpx;
+  border: 1rpx solid #927748;
+  border-radius: 32rpx;
+  background: linear-gradient(145deg, #21372e, #111f19 72%);
+  box-shadow: 0 24rpx 70rpx #0009;
+  color: #f8e9cc;
+}
+.panel-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 24rpx; }
+.panel-title { font-size: 44rpx; font-weight: 600; letter-spacing: 4rpx; }
+.close {
+  width: 64rpx; height: 64rpx; border-radius: 50%;
+  border: 1rpx solid #a98b565f; background: #101a16;
+  color: #eed6ad; display: flex; align-items: center; justify-content: center; font-size: 32rpx;
+}
+.row {
+  display: flex; justify-content: space-between; align-items: center;
+  min-height: 108rpx; border-top: 1rpx solid #d8ba7d2e; font-size: 30rpx;
+}
+.switch {
+  position: relative; width: 88rpx; height: 52rpx; border-radius: 48rpx;
+  background: #0b1913; border: 1rpx solid #708479;
+}
+.knob {
+  position: absolute; top: 4rpx; left: 4rpx; width: 40rpx; height: 40rpx;
+  border-radius: 50%; background: #b4c0b4; transition: transform .2s;
+}
+.switch.on { background: #947747; border-color: #ddc084; }
+.switch.on .knob { transform: translateX(36rpx); background: #fff0ce; }
+.tip { display: block; margin: -4rpx 0 16rpx; color: #c2cbc1; line-height: 1.55; font-size: 24rpx; }

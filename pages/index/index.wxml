@@ -1,0 +1,49 @@
+<view class="stage">
+  <image class="scene" src="/assets/bg/{{landscape ? 'landscape' : 'scene'}}.jpg" mode="aspectFill"></image>
+  <view class="veil"></view>
+
+  <view class="tap-layer" bindtap="onStageTap"></view>
+
+  <view class="header">
+    <view class="brand">
+      <view class="wordmark"><view class="diamond"></view><text>{{wordmark}}</text></view>
+      <text class="title" style="font-size:{{titleFontSize}}rpx">{{title}}</text>
+    </view>
+    <view class="settings-btn" bindtap="openSettings" aria-label="设置">
+      <view class="gear">⚙</view>
+    </view>
+  </view>
+
+  <canvas type="2d" id="playfield" class="playfield" disable-scroll="true"></canvas>
+
+  <!-- 实景骰盅：默认盖住骰子，点按掀开移到右上，掷骰时自动盖回 -->
+  <view class="cup-control {{cupOpen ? 'cup-open' : ''}} {{rolling ? 'cup-rattling' : ''}}" bindtap="onCupTap" aria-label="{{cupOpen ? '盖回骰盅' : '掀开骰盅，查看骰子'}}">
+    <view class="cup-rig">
+      <image class="cup-art cup-closed" src="/assets/cup/cup-closed.png" mode="contain"></image>
+      <image class="cup-art cup-open-art" src="/assets/cup/cup-open.png" mode="contain"></image>
+    </view>
+  </view>
+
+  <view class="status"><view class="diamond small"></view><text>{{outcome}}</text><view class="diamond small"></view></view>
+
+  <view class="bar">
+    <text class="counter-label">骰子数量</text>
+    <view class="bar-row">
+      <view class="counter">
+        <view class="step {{count <= 1 ? 'disabled' : ''}}" bindtap="onMinus">−</view>
+        <view class="num">{{count}}</view>
+        <view class="step {{count >= 12 ? 'disabled' : ''}}" bindtap="onPlus">+</view>
+      </view>
+      <view class="roll-btn {{rolling ? 'rolling' : ''}}" bindtap="onRoll"><text class="die-icon">⚄</text><text>摇骰子</text></view>
+    </view>
+  </view>
+
+  <view class="sheet-mask" wx:if="{{showSettings}}" bindtap="closeSettings"></view>
+  <view class="sheet" wx:if="{{showSettings}}">
+    <view class="panel-head"><text class="panel-title">设置</text><view class="close" bindtap="closeSettings">✕</view></view>
+    <view class="row"><text>音效</text><view class="switch {{soundOn ? 'on' : ''}}" data-k="sound" bindtap="toggleSound"><view class="knob"></view></view></view>
+    <view class="row"><text>摇一摇</text><view class="switch {{shakeOn ? 'on' : ''}}" data-k="shake" bindtap="toggleShake"><view class="knob"></view></view></view>
+    <text class="tip">{{shakeTip}}</text>
+    <view class="row"><text>双击掷骰</text><view class="switch {{tapRollOn ? 'on' : ''}}" data-k="tap" bindtap="toggleTap"><view class="knob"></view></view></view>
+  </view>
+</view>
