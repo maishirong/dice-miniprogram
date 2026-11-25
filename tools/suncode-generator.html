@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>太阳码场景参数生成器 · 酒桌骰趣</title>
+<style>
+  :root{
+    --bg:#0d100f; --panel:#161b19; --panel2:#1d2421; --line:#2c3a34;
+    --gold:#e8c789; --gold2:#c9a465; --txt:#f0e6d2; --sub:#9aa89f;
+    --ok:#6fd08c; --warn:#e8b04b; --err:#e06c6c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:radial-gradient(1200px 600px at 50% -10%,#1b2a22 0%,var(--bg) 60%);
+    color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    min-height:100vh; padding:32px 20px 60px;
+  }
+  .wrap{max-width:860px;margin:0 auto}
+  .head{text-align:center;margin-bottom:28px}
+  .head h1{margin:0;font-size:26px;letter-spacing:2px;color:var(--gold);font-weight:700}
+  .head p{margin:10px 0 0;color:var(--sub);font-size:13px;line-height:1.7}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}
+  label.title{display:block;font-size:14px;color:var(--gold2);margin-bottom:10px;font-weight:600}
+  textarea{
+    width:100%;min-height:150px;background:var(--panel2);color:var(--txt);
+    border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:14px;
+    line-height:1.9;resize:vertical;outline:none;font-family:inherit;
+  }
+  textarea:focus{border-color:var(--gold2)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  button{
+    background:linear-gradient(145deg,#f0d39c,#c9a465);color:#2a1c10;border:none;
+    border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;
+  }
+  button:hover{filter:brightness(1.08)}
+  button.ghost{background:transparent;color:var(--gold);border:1px solid var(--line)}
+  .hint{color:var(--sub);font-size:12px}
+  .result-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .result-head span{font-size:14px;color:var(--gold2);font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{color:var(--sub);font-weight:500;font-size:12px}
+  td.name{color:var(--txt);font-weight:600;white-space:nowrap}
+  td.scene{font-family:"SF Mono",Menlo,Consolas,monospace;color:var(--gold);word-break:break-all;font-size:12px}
+  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+  .badge.ok{background:rgba(111,208,140,.14);color:var(--ok)}
+  .badge.warn{background:rgba(232,176,75,.14);color:var(--warn)}
+  .badge.err{background:rgba(224,108,108,.14);color:var(--err)}
+  .copy{background:transparent;border:1px solid var(--line);color:var(--sub);padding:5px 11px;border-radius:7px;font-size:12px;cursor:pointer}
+  .copy:hover{color:var(--gold);border-color:var(--gold2)}
+  .note{background:var(--panel2);border-left:3px solid var(--gold2);border-radius:0 10px 10px 0;padding:16px 18px;color:var(--sub);font-size:13px;line-height:1.9}
+  .note b{color:var(--gold)}
+  .steps{counter-reset:s;margin:8px 0 0;padding-left:0;list-style:none}
+  .steps li{position:relative;padding-left:30px;margin-bottom:8px}
+  .steps li:before{counter-increment:s;content:counter(s);position:absolute;left:0;top:1px;width:20px;height:20px;border-radius:50%;background:var(--gold2);color:#2a1c10;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .empty{color:var(--sub);text-align:center;padding:30px;font-size:13px}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gold);color:#2a1c10;padding:11px 24px;border-radius:24px;font-size:13px;font-weight:600;opacity:0;transition:.25s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>太阳码场景参数生成器</h1>
+    <p>酒桌骰趣 · 每个店名生成一条独立的 scene 参数，用于生成带中文店名的太阳码<br>店名建议 ≤ 7 个中文，编码后不超过微信 scene 的 32 字符上限</p>
+  </div>
+
+  <div class="card">
+    <label class="title">店名列表（每行一个，可留空行）</label>
+    <textarea id="input" placeholder="欣欣小酒馆&#10;老地方酒馆&#10;深夜食堂">欣欣小酒馆
+老地方酒馆
+深夜食堂</textarea>
+    <div class="row">
+      <button onclick="generate()">生成 scene 参数</button>
+      <button class="ghost" onclick="copyAll()">复制全部</button>
+      <span class="hint">中文会自动编码，小程序端自动解码显示为店名 +「· 骰盅游戏」</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="result-head"><span>生成结果</span><span class="hint" id="count"></span></div>
+    <div id="result"><div class="empty">点击「生成 scene 参数」查看结果</div></div>
+  </div>
+
+  <div class="card note">
+    <b>如何生成太阳码（微信公众平台后台）</b>
+    <ol class="steps">
+      <li>登录小程序后台 → 开发管理 → 开发设置，找到「小程序码」生成入口</li>
+      <li>选「获取小程序码」（不限数量 / getUnlimited）</li>
+      <li>页面路径填：<b>pages/index/index</b></li>
+      <li>scene 填下表对应店名的参数串（点「复制」）</li>
+      <li>生成并下载太阳码，每个店名重复一次即可</li>
+    </ol>
+    <div style="margin-top:12px">扫码效果：打开小程序，标题自动显示为 <b>店名 · 骰盅游戏</b>，并记住该名字。</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// 与小程序 brand.js 的 decodeSceneName 完全配对
+function encodeName(name){
+  const bytes = new TextEncoder().encode(name);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function makeScene(name){
+  return 'n=' + encodeName(name.trim());
+}
+let rows = [];
+function generate(){
+  const lines = document.getElementById('input').value.split(/\n/).map(s=>s.trim()).filter(Boolean);
+  rows = lines.map(name=>{
+    const scene = makeScene(name);
+    return {name, scene, len:scene.length};
+  });
+  render();
+}
+function render(){
+  const box = document.getElementById('result');
+  document.getElementById('count').textContent = rows.length ? '共 ' + rows.length + ' 条' : '';
+  if(!rows.length){ box.innerHTML='<div class="empty">没有店名，请先输入</div>'; return; }
+  let html = '<table><thead><tr><th style="width:32px">#</th><th>店名</th><th>scene 参数</th><th style="width:70px">字符</th><th style="width:56px">操作</th></tr></thead><tbody>';
+  rows.forEach((r,i)=>{
+    const cls = r.len>32?'err':(r.len>28?'warn':'ok');
+    const label = r.len>32?'超限':(r.len>28?'临界':'正常');
+    html += `<tr><td>${i+1}</td><td class="name">${escapeHtml(r.name)}</td><td class="scene">${escapeHtml(r.scene)}</td><td><span class="badge ${cls}">${r.len} ${label}</span></td><td><button class="copy" onclick="copyOne(${i})">复制</button></td></tr>`;
+  });
+  html += '</tbody></table>';
+  if(rows.some(r=>r.len>32)) html += '<div class="hint" style="margin-top:12px;color:var(--err)">有店名编码后超过 32 字符，微信太阳码无法使用，请缩短店名。</div>';
+  box.innerHTML = html;
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1500);
+}
+function copyOne(i){
+  navigator.clipboard.writeText(rows[i].scene).then(()=>toast('已复制：'+rows[i].name));
+}
+function copyAll(){
+  if(!rows.length){toast('请先生成');return;}
+  navigator.clipboard.writeText(rows.map(r=>`${r.name}\t${r.scene}`).join('\n')).then(()=>toast('已复制全部'));
+}
+generate();
+</script>
+</body>
+</html>
